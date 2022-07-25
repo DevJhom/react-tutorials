@@ -6,6 +6,7 @@ const Tasks = (props) => {
   let taskList = <h2>No tasks found. Start adding some!</h2>;
 
   if (props.items.length > 0) {
+    //overwrite taskList with the actual tasks
     taskList = (
       <ul>
         {props.items.map((task) => (
