@@ -1,3 +1,6 @@
 /node_modules
 /build
 .eslintcache
+.firebaserc
+firebase.json
+hosting.YnVpbGQ.cache
