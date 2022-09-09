@@ -1,29 +1,9 @@
+import { MongoClient } from "mongodb";
+
 import MeetupList from "../components/meetups/MeetupList";
 
-const DUMMY_MEETUPS = [
-  {
-    id: "m1",
-    title: "A tech conference",
-    image:
-      "https://images.unsplash.com/photo-1582192730841-2a682d7375f9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTY1NzkxNDE0OA&ixlib=rb-1.2.1&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
-    address: "Brussels, Belgium",
-    description: "A glance at new AI technologies",
-  },
-  {
-    id: "m2",
-    title: "A robotic conference",
-    image:
-      "https://images.unsplash.com/photo-1582192730841-2a682d7375f9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTY1NzkxNDE0OA&ixlib=rb-1.2.1&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
-    address: "Osaka, Japan",
-    description: "A glance at robotic and automation",
-  },
-];
-
 const HomePage = (props) => {
-
-  return (
-      <MeetupList meetups={props.meetups} />
-  );
+  return <MeetupList meetups={props.meetups} />;
 };
 
 // export async function getServerSideProps(context) {
@@ -40,12 +20,28 @@ const HomePage = (props) => {
 // }
 
 export async function getStaticProps() {
-// fetch data from an API
+  // fetch data from an API
+  const client = await MongoClient.connect(
+    "mongodb+srv://jhom:admin123@cluster0.8fzm4ck.mongodb.net/meetups?retryWrites=true&w=majority"
+  );
+  const db = client.db();
+
+  const meetupsCollection = db.collection("meetups");
+
+  const meetups = await meetupsCollection.find().toArray();
+
+  client.close();
 
   return {
     props: {
-      meetups: DUMMY_MEETUPS
-    }
+      meetups: meetups.map((meetup) => ({
+        title: meetup.title,
+        address: meetup.address,
+        image: meetup.image,
+        id: meetup._id.toString(),
+      })),
+    },
+    revalidate: 1,
   };
 }
 
